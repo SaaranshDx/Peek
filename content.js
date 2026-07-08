@@ -19,9 +19,19 @@ chrome.runtime.onMessage.addListener((message) => {
                 <button id="peek-close">✕</button>
             </div>
 
+            <div id="peek-loader"></div>
             <iframe src="${message.url}"></iframe>
         </div>
     `;
+
+    const iframe = overlay.querySelector("iframe");
+    const loader = overlay.querySelector("#peek-loader");
+
+    iframe.style.display = "none";
+    iframe.onload = () => {
+        loader.style.display = "none";
+        iframe.style.display = "";
+    };
 
     document.body.appendChild(overlay);
 
