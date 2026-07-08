@@ -12,10 +12,12 @@ chrome.runtime.onMessage.addListener((message) => {
     const overlay = document.createElement("div");
     overlay.id = "peek-overlay";
 
+    const urlObj = new URL(message.url);
+
     overlay.innerHTML = `
         <div id="peek-window">
             <div id="peek-header">
-                <span>Peek</span>
+                <span id="peek-title">${urlObj.hostname}</span>
                 <div id="peek-actions">
                     <button id="peek-fullscreen" title="Fullscreen">⛶</button>
                     <button id="peek-newtab" title="Open in new tab">↗</button>
@@ -43,18 +45,49 @@ chrome.runtime.onMessage.addListener((message) => {
         showError();
     };
 
+    const titleSpan = overlay.querySelector("#peek-title");
+
     iframe.onload = () => {
         loader.style.display = "none";
-        // Try accessing the iframe content to detect CSP/X-Frame-Options blocks
+        let sameOrigin = false;
+        let blocked = false;
+
         try {
-            if (iframe.contentDocument) {
-                iframe.style.display = "";
+            const doc = iframe.contentDocument;
+            if (doc && doc.body && doc.body.children.length > 1) {
+                sameOrigin = true;
             } else {
-                throw new Error("Blocked");
+                blocked = true;
             }
         } catch {
+            // Cross-origin: contentDocument access throws
+        }
+
+        if (blocked) {
             loadError = true;
+            iframe.style.display = "none";
             showError();
+            return;
+        }
+
+        iframe.style.display = "";
+
+        if (sameOrigin) {
+            try {
+                const t = iframe.contentDocument.title;
+                if (t) titleSpan.textContent = t;
+            } catch {}
+        } else {
+            // Cross-origin: fetch page to extract title
+            fetch(message.url)
+                .then(r => r.text())
+                .then(html => {
+                    const match = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+                    titleSpan.textContent = match ? match[1] : urlObj.hostname;
+                })
+                .catch(() => {
+                    titleSpan.textContent = urlObj.hostname;
+                });
         }
     };
 

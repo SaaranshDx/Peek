@@ -38,6 +38,15 @@
     font-family: sans-serif;
     font-size: 14px;
     cursor: grab;
+    gap: 8px;
+}
+
+#peek-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+    min-width: 0;
 }
 
 #peek-actions {
