@@ -94,26 +94,69 @@ chrome.runtime.onMessage.addListener((message) => {
             overlay.remove();
     };
 
+    // Dragging via the header
+    const header = overlay.querySelector("#peek-header");
+    let dragStartX, dragStartY, dragOriginX, dragOriginY;
+
+    const cancelDrag = () => {
+        document.body.style.cursor = "";
+        document.body.style.userSelect = "";
+        header.removeEventListener("pointermove", onDragMove);
+        header.removeEventListener("pointerup", onDragEnd);
+    };
+
+    const onDragMove = (ev) => {
+        const dx = ev.clientX - dragStartX;
+        const dy = ev.clientY - dragStartY;
+        peekWindow.style.transform = `translate(${dragOriginX + dx}px, ${dragOriginY + dy}px)`;
+    };
+
+    const onDragEnd = () => {
+        const match = peekWindow.style.transform.match(/translate\(([-\d.]+)px,\s*([-\d.]+)px\)/);
+        if (match) {
+            dragOriginX = parseFloat(match[1]);
+            dragOriginY = parseFloat(match[2]);
+        }
+        cancelDrag();
+    };
+
+    header.onpointerdown = (e) => {
+        if (e.target.closest("button")) return;
+        e.preventDefault();
+        header.setPointerCapture(e.pointerId);
+
+        dragStartX = e.clientX;
+        dragStartY = e.clientY;
+        const match = peekWindow.style.transform.match(/translate\(([-\d.]+)px,\s*([-\d.]+)px\)/);
+        dragOriginX = match ? parseFloat(match[1]) : 0;
+        dragOriginY = match ? parseFloat(match[2]) : 0;
+
+        document.body.style.cursor = "grabbing";
+        document.body.style.userSelect = "none";
+
+        header.addEventListener("pointermove", onDragMove);
+        header.addEventListener("pointerup", onDragEnd);
+    };
+
     // Resize via drag on the handle
     const handle = overlay.querySelector("#peek-resize-handle");
+    let resizeStartX, resizeStartY, resizeStartW, resizeStartH;
 
     const cancelResize = () => {
         document.body.style.cursor = "";
         document.body.style.userSelect = "";
-        handle.removeEventListener("pointermove", onPointerMove);
-        handle.removeEventListener("pointerup", onPointerUp);
+        handle.removeEventListener("pointermove", onResizeMove);
+        handle.removeEventListener("pointerup", onResizeEnd);
     };
 
-    let startX, startY, startW, startH;
-
-    const onPointerMove = (ev) => {
-        const w = Math.max(300, startW + (ev.clientX - startX));
-        const h = Math.max(200, startH + (ev.clientY - startY));
+    const onResizeMove = (ev) => {
+        const w = Math.max(300, resizeStartW + (ev.clientX - resizeStartX));
+        const h = Math.max(200, resizeStartH + (ev.clientY - resizeStartY));
         peekWindow.style.width = w + "px";
         peekWindow.style.height = h + "px";
     };
 
-    const onPointerUp = () => {
+    const onResizeEnd = () => {
         cancelResize();
     };
 
@@ -121,22 +164,23 @@ chrome.runtime.onMessage.addListener((message) => {
         e.preventDefault();
         handle.setPointerCapture(e.pointerId);
 
-        startX = e.clientX;
-        startY = e.clientY;
-        startW = peekWindow.offsetWidth;
-        startH = peekWindow.offsetHeight;
+        resizeStartX = e.clientX;
+        resizeStartY = e.clientY;
+        resizeStartW = peekWindow.offsetWidth;
+        resizeStartH = peekWindow.offsetHeight;
 
         document.body.style.cursor = "nwse-resize";
         document.body.style.userSelect = "none";
 
-        handle.addEventListener("pointermove", onPointerMove);
-        handle.addEventListener("pointerup", onPointerUp);
+        handle.addEventListener("pointermove", onResizeMove);
+        handle.addEventListener("pointerup", onResizeEnd);
     };
 
-    // Cleanup resize whenever the overlay is removed
+    // Cleanup interactions whenever the overlay is removed
     const origRemove = overlay.remove.bind(overlay);
     overlay.remove = () => {
         cancelResize();
+        cancelDrag();
         origRemove();
     };
 });
