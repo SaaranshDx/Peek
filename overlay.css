@@ -70,6 +70,12 @@
     to { transform: rotate(360deg); }
 }
 
+#peek-window.peek-fullscreen {
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
+}
+
 #peek-window iframe {
     flex: 1;
     border: none;

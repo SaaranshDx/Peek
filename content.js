@@ -46,13 +46,9 @@ chrome.runtime.onMessage.addListener((message) => {
         overlay.remove();
     };
 
-    // Fullscreen toggle
+    // Fullscreen toggle (fills the viewport within the overlay)
     overlay.querySelector("#peek-fullscreen").onclick = () => {
-        if (document.fullscreenElement === peekWindow) {
-            document.exitFullscreen();
-        } else {
-            peekWindow.requestFullscreen();
-        }
+        peekWindow.classList.toggle("peek-fullscreen");
     };
 
     // Open in new tab
