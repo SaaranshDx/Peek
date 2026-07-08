@@ -2,6 +2,9 @@
 
 ## 0.3.0
 
+### Changed
+- Increase overlay height from 80vh to 90vh
+
 ### Fixed
 - Switch background to `scripts` array for Firefox MV3 compatibility
 - Add `browser_specific_settings` for Gecko add-on ID
