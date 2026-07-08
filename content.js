@@ -42,7 +42,9 @@ chrome.runtime.onMessage.addListener((message) => {
         loadError = true;
         loader.style.display = "none";
         iframe.style.display = "none";
-        showError();
+        //proxy the page LOL
+        //showError();
+        proxyPage(message.url);
     };
 
     const titleSpan = overlay.querySelector("#peek-title");
@@ -66,7 +68,9 @@ chrome.runtime.onMessage.addListener((message) => {
         if (blocked) {
             loadError = true;
             iframe.style.display = "none";
-            showError();
+            //proxy the page LOL
+            //showError();
+            proxyPage(message.url);
             return;
         }
 
@@ -89,6 +93,12 @@ chrome.runtime.onMessage.addListener((message) => {
                     titleSpan.textContent = urlObj.hostname;
                 });
         }
+    };
+
+    const proxyPage = (url) => {
+        const proxyUrl = `http://localhost:3000/proxy?url=${encodeURIComponent(url)}`;
+        iframe.src = proxyUrl;
+        iframe.style.display = "";
     };
 
     const showError = () => {
