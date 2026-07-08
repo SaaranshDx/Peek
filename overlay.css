@@ -1,0 +1,47 @@
+#peek-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 2147483647;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#peek-window {
+    background: #fff;
+    border: 2px solid #333;
+    border-radius: 8px;
+    overflow: hidden;
+
+    width: 80vw;
+    height: 80vh;
+
+    display: flex;
+    flex-direction: column;
+}
+
+#peek-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background: #f0f0f0;
+    border-bottom: 1px solid #ccc;
+    font-family: sans-serif;
+    font-size: 14px;
+}
+
+#peek-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 2px 6px;
+}
+
+#peek-window iframe {
+    flex: 1;
+    border: none;
+}
