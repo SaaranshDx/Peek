@@ -66,36 +66,46 @@ chrome.runtime.onMessage.addListener((message) => {
 
     // Resize via drag on the handle
     const handle = overlay.querySelector("#peek-resize-handle");
-    let resizing = false;
+    let onMouseMove, onMouseUp;
+
+    const cancelResize = () => {
+        document.body.style.cursor = "";
+        document.body.style.userSelect = "";
+        if (onMouseMove) document.removeEventListener("mousemove", onMouseMove);
+        if (onMouseUp) document.removeEventListener("mouseup", onMouseUp);
+        onMouseMove = onMouseUp = undefined;
+    };
 
     handle.onmousedown = (e) => {
         e.preventDefault();
-        resizing = true;
-        document.body.style.cursor = "nwse-resize";
-        document.body.style.userSelect = "none";
 
         const startX = e.clientX;
         const startY = e.clientY;
         const startW = peekWindow.offsetWidth;
         const startH = peekWindow.offsetHeight;
 
-        const onMouseMove = (ev) => {
-            if (!resizing) return;
+        document.body.style.cursor = "nwse-resize";
+        document.body.style.userSelect = "none";
+
+        onMouseMove = (ev) => {
             const w = Math.max(300, startW + (ev.clientX - startX));
             const h = Math.max(200, startH + (ev.clientY - startY));
             peekWindow.style.width = w + "px";
             peekWindow.style.height = h + "px";
         };
 
-        const onMouseUp = () => {
-            resizing = false;
-            document.body.style.cursor = "";
-            document.body.style.userSelect = "";
-            document.removeEventListener("mousemove", onMouseMove);
-            document.removeEventListener("mouseup", onMouseUp);
+        onMouseUp = () => {
+            cancelResize();
         };
 
         document.addEventListener("mousemove", onMouseMove);
         document.addEventListener("mouseup", onMouseUp);
+    };
+
+    // Cleanup resize whenever the overlay is removed
+    const origRemove = overlay.remove.bind(overlay);
+    overlay.remove = () => {
+        cancelResize();
+        origRemove();
     };
 });
