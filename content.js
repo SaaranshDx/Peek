@@ -24,8 +24,8 @@ chrome.runtime.onMessage.addListener((message) => {
             </div>
 
             <div id="peek-loader"></div>
-            <div id="peek-resize-handle"></div>
             <iframe src="${message.url}"></iframe>
+            <div id="peek-resize-handle"></div>
         </div>
     `;
 
