@@ -24,6 +24,7 @@ chrome.runtime.onMessage.addListener((message) => {
             </div>
 
             <div id="peek-loader"></div>
+            <div id="peek-resize-handle"></div>
             <iframe src="${message.url}"></iframe>
         </div>
     `;
@@ -61,5 +62,40 @@ chrome.runtime.onMessage.addListener((message) => {
     overlay.onclick = (e) => {
         if (e.target === overlay)
             overlay.remove();
+    };
+
+    // Resize via drag on the handle
+    const handle = overlay.querySelector("#peek-resize-handle");
+    let resizing = false;
+
+    handle.onmousedown = (e) => {
+        e.preventDefault();
+        resizing = true;
+        document.body.style.cursor = "nwse-resize";
+        document.body.style.userSelect = "none";
+
+        const startX = e.clientX;
+        const startY = e.clientY;
+        const startW = peekWindow.offsetWidth;
+        const startH = peekWindow.offsetHeight;
+
+        const onMouseMove = (ev) => {
+            if (!resizing) return;
+            const w = Math.max(300, startW + (ev.clientX - startX));
+            const h = Math.max(200, startH + (ev.clientY - startY));
+            peekWindow.style.width = w + "px";
+            peekWindow.style.height = h + "px";
+        };
+
+        const onMouseUp = () => {
+            resizing = false;
+            document.body.style.cursor = "";
+            document.body.style.userSelect = "";
+            document.removeEventListener("mousemove", onMouseMove);
+            document.removeEventListener("mouseup", onMouseUp);
+        };
+
+        document.addEventListener("mousemove", onMouseMove);
+        document.addEventListener("mouseup", onMouseUp);
     };
 });

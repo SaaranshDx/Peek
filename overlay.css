@@ -76,6 +76,27 @@
     border-radius: 0;
 }
 
+#peek-resize-handle {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 16px;
+    height: 16px;
+    cursor: nwse-resize;
+    z-index: 1;
+}
+
+#peek-resize-handle::after {
+    content: "";
+    position: absolute;
+    bottom: 3px;
+    right: 3px;
+    width: 10px;
+    height: 10px;
+    border-right: 2px solid #888;
+    border-bottom: 2px solid #888;
+}
+
 #peek-window iframe {
     flex: 1;
     border: none;
