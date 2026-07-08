@@ -66,40 +66,41 @@ chrome.runtime.onMessage.addListener((message) => {
 
     // Resize via drag on the handle
     const handle = overlay.querySelector("#peek-resize-handle");
-    let onMouseMove, onMouseUp;
 
     const cancelResize = () => {
         document.body.style.cursor = "";
         document.body.style.userSelect = "";
-        if (onMouseMove) document.removeEventListener("mousemove", onMouseMove);
-        if (onMouseUp) document.removeEventListener("mouseup", onMouseUp);
-        onMouseMove = onMouseUp = undefined;
+        handle.removeEventListener("pointermove", onPointerMove);
+        handle.removeEventListener("pointerup", onPointerUp);
     };
 
-    handle.onmousedown = (e) => {
-        e.preventDefault();
+    let startX, startY, startW, startH;
 
-        const startX = e.clientX;
-        const startY = e.clientY;
-        const startW = peekWindow.offsetWidth;
-        const startH = peekWindow.offsetHeight;
+    const onPointerMove = (ev) => {
+        const w = Math.max(300, startW + (ev.clientX - startX));
+        const h = Math.max(200, startH + (ev.clientY - startY));
+        peekWindow.style.width = w + "px";
+        peekWindow.style.height = h + "px";
+    };
+
+    const onPointerUp = () => {
+        cancelResize();
+    };
+
+    handle.onpointerdown = (e) => {
+        e.preventDefault();
+        handle.setPointerCapture(e.pointerId);
+
+        startX = e.clientX;
+        startY = e.clientY;
+        startW = peekWindow.offsetWidth;
+        startH = peekWindow.offsetHeight;
 
         document.body.style.cursor = "nwse-resize";
         document.body.style.userSelect = "none";
 
-        onMouseMove = (ev) => {
-            const w = Math.max(300, startW + (ev.clientX - startX));
-            const h = Math.max(200, startH + (ev.clientY - startY));
-            peekWindow.style.width = w + "px";
-            peekWindow.style.height = h + "px";
-        };
-
-        onMouseUp = () => {
-            cancelResize();
-        };
-
-        document.addEventListener("mousemove", onMouseMove);
-        document.addEventListener("mouseup", onMouseUp);
+        handle.addEventListener("pointermove", onPointerMove);
+        handle.addEventListener("pointerup", onPointerUp);
     };
 
     // Cleanup resize whenever the overlay is removed
