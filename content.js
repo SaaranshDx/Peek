@@ -33,9 +33,39 @@ chrome.runtime.onMessage.addListener((message) => {
     const loader = overlay.querySelector("#peek-loader");
 
     iframe.style.display = "none";
+
+    let loadError = false;
+
+    iframe.onerror = () => {
+        loadError = true;
+        loader.style.display = "none";
+        iframe.style.display = "none";
+        showError();
+    };
+
     iframe.onload = () => {
         loader.style.display = "none";
-        iframe.style.display = "";
+        // Try accessing the iframe content to detect CSP/X-Frame-Options blocks
+        try {
+            if (iframe.contentDocument) {
+                iframe.style.display = "";
+            } else {
+                throw new Error("Blocked");
+            }
+        } catch {
+            loadError = true;
+            showError();
+        }
+    };
+
+    const showError = () => {
+        const err = document.createElement("div");
+        err.id = "peek-error";
+        err.innerHTML = `
+            <span>This site can't be loaded in the preview.</span>
+            <a href="${message.url}" target="_blank" id="peek-error-link">Open in new tab →</a>
+        `;
+        peekWindow.appendChild(err);
     };
 
     document.body.appendChild(overlay);
