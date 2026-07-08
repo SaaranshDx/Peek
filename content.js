@@ -16,7 +16,11 @@ chrome.runtime.onMessage.addListener((message) => {
         <div id="peek-window">
             <div id="peek-header">
                 <span>Peek</span>
-                <button id="peek-close">✕</button>
+                <div id="peek-actions">
+                    <button id="peek-fullscreen" title="Fullscreen">⛶</button>
+                    <button id="peek-newtab" title="Open in new tab">↗</button>
+                    <button id="peek-close" title="Close">✕</button>
+                </div>
             </div>
 
             <div id="peek-loader"></div>
@@ -35,8 +39,25 @@ chrome.runtime.onMessage.addListener((message) => {
 
     document.body.appendChild(overlay);
 
+    const peekWindow = overlay.querySelector("#peek-window");
+
     // Close button
     overlay.querySelector("#peek-close").onclick = () => {
+        overlay.remove();
+    };
+
+    // Fullscreen toggle
+    overlay.querySelector("#peek-fullscreen").onclick = () => {
+        if (document.fullscreenElement === peekWindow) {
+            document.exitFullscreen();
+        } else {
+            peekWindow.requestFullscreen();
+        }
+    };
+
+    // Open in new tab
+    overlay.querySelector("#peek-newtab").onclick = () => {
+        window.open(message.url, "_blank");
         overlay.remove();
     };
 

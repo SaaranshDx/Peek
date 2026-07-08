@@ -34,12 +34,23 @@
     font-size: 14px;
 }
 
-#peek-close {
+#peek-actions {
+    display: flex;
+    gap: 4px;
+}
+
+#peek-actions button {
     background: none;
     border: none;
     cursor: pointer;
     font-size: 16px;
     padding: 2px 6px;
+    line-height: 1;
+    border-radius: 4px;
+}
+
+#peek-actions button:hover {
+    background: rgba(0, 0, 0, 0.08);
 }
 
 #peek-loader {
