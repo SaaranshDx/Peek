@@ -5,6 +5,12 @@
 
   "description": "Preview links without opening a new tab.",
 
+  "browser_specific_settings": {
+  "gecko": {
+    "id": "peek@mizucode.qzz.io"
+        }
+    },
+
   "permissions": [
     "contextMenus",
     "scripting",
