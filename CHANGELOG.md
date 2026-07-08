@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.3.0
+## 0.3.0 ( unreleased )
 
 ### Changed
 - Increase overlay height from 80vh to 90vh
