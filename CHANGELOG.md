@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.0
+
+### Fixed
+- Switch background to `scripts` array for Firefox MV3 compatibility
+- Add `browser_specific_settings` for Gecko add-on ID
+
 ## 0.2.0
 
 ### Added
